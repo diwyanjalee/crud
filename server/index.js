@@ -1,4 +1,6 @@
 const express = require ('express');
+const bodyparser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const mysql = require("mysql");
 
@@ -9,21 +11,20 @@ const db = mysql.createConnection({
     database: "CRUDReact"
 });
 
-db.connect(function(err){
-    if(err) throw err;
-    console.log("connected!");
+app.use(cors());
+app.use(express.json());
+app.use(bodyparser.urlencoded({extended:true}));
+
+app.post("/api/insert", (req, res) =>{
+
+    const MovieName = req.body.MovieName;
+    const MovieReview = req.body.MovieReview;
+
+    const sqlInsert = "INSERT INTO reviewtable(ID,MovieName,MovieReview) VALUES (NULL,?,?)";
+    db.query(sqlInsert,[MovieName,MovieReview],(err, result) => {
+        console.log(result);
+    });
 });
-
-
-
-app.get("/", (req, res) =>{
-
-    const sqlInsert = "SELECT * FROM 'reviewtable';"
-    db.query(sqlInsert,(err, result)=> {
-        res.send(result);
-    })
-});
-
    
 
 app.listen(3001, () => {
